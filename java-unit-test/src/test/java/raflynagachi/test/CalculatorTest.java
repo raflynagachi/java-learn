@@ -1,12 +1,14 @@
 package raflynagachi.test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 
 public class CalculatorTest {
     private Calculator calculator = new Calculator();
@@ -45,5 +47,16 @@ public class CalculatorTest {
         assertThrows(IllegalArgumentException.class, () -> {
             calculator.divide(10, 0);
         });
+    }
+
+    @Test
+    // abort unit test when env is not dev
+    public void testAborted(){
+        var env = System.getenv("env");
+        if (!"dev".equals(env)) {
+            throw new TestAbortedException();
+        }
+
+        assumeTrue(env=="dev"); // other way to abort
     }
 }
