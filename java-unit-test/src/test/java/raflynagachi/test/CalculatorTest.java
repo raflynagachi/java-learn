@@ -7,8 +7,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentest4j.TestAbortedException;
 
 public class CalculatorTest {
@@ -60,5 +63,13 @@ public class CalculatorTest {
         }
 
         assumeTrue(env=="dev"); // other way to abort
+    }
+
+    @DisplayName("Test with parameter")
+    @ParameterizedTest(name = "{displayName} with data {0}")
+    @ValueSource(ints = {1,14,5})
+    public void testWithParameter(int value){
+        var result = value+value;
+        assertEquals(result, calculator.sum(value, value));
     }
 }
