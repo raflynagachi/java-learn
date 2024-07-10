@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.opentest4j.TestAbortedException;
 
 public class CalculatorTest {
@@ -35,6 +36,7 @@ public class CalculatorTest {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "env", matches = "prod")
     public void testDivideWhenError(){
         assertThrows(IllegalArgumentException.class, () -> {
             calculator.divide(10, 0);
