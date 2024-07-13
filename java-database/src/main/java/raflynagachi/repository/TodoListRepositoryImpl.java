@@ -1,52 +1,97 @@
 package raflynagachi.repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import raflynagachi.entity.TodoList;
 
-public class TodoListRepositoryImpl implements TodoListRepository{
+public class TodoListRepositoryImpl implements TodoListRepository {
 
-    private TodoList[] todoList = new TodoList[10];
+    private DataSource dataSource;
+
+    public TodoListRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public TodoList[] getAll() {
-        return this.todoList;
+        String sql = "SELECT id, todo, created_at, created_by FROM todolist";
+        try (Connection conn = this.dataSource.getConnection();
+                PreparedStatement prepStmt = conn.prepareStatement(sql);
+                ResultSet resultSet = prepStmt.executeQuery()) {
+
+            List<TodoList> list = new ArrayList<>();
+            while (resultSet.next()) {
+                TodoList todoList = new TodoList();
+                todoList.setId(resultSet.getInt("id"));
+                todoList.setTodo(resultSet.getString("todo"));
+                todoList.setCreatedAt(resultSet.getString("created_at"));
+                todoList.setCreatedBy(resultSet.getString("created_by"));
+
+                list.add(todoList);
+            }
+
+            return list.toArray(new TodoList[] {});
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void add(TodoList todo) {
-        boolean isFull = true;
-        for (int i = 0; i < todoList.length; i++) {
-            if (todoList[i] == null) {
-                isFull = false;
-                todoList[i] = todo;
-                break;
-            }
+        String sql = "INSERT INTO todolist (todo, created_by) VALUES(?,?)";
+        try (Connection conn = this.dataSource.getConnection();
+                PreparedStatement prepStmt = conn.prepareStatement(sql)) {
+
+            prepStmt.setString(1, todo.getTodo());
+            prepStmt.setString(2, "SYSTEM");
+            prepStmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        if (isFull) {
-            var tmp = todoList;
-            todoList = new TodoList[todoList.length * 2];
-            System.arraycopy(tmp, 0, todoList, 0, tmp.length);
-            for (int i = 0; i < todoList.length; i++) {
-                if (todoList[i] == null) {
-                    todoList[i] = todo;
-                    break;
+    }
+
+    public boolean isExist(Integer id) {
+        String sql = "SELECT id FROM todolist WHERE id=?";
+        try (Connection conn = this.dataSource.getConnection();
+                PreparedStatement prepStmt = conn.prepareStatement(sql)) {
+
+            prepStmt.setInt(1, id);
+            try (ResultSet resultSet = prepStmt.executeQuery()) {
+                if (resultSet.next()) {
+                    return true;
                 }
+                return false;
+            } catch (SQLException e) {
+                throw new RuntimeException();
             }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public boolean remove(Integer id) {
-        id -= 1;
-        if (id >= todoList.length) {
-            return false;
-        } else if (todoList[id] == null) {
+        if (!isExist(id)) {
             return false;
         }
-        todoList[id] = null;
-        for (int i = id; i < todoList.length; i++) {
-            if (i == todoList.length - 1) {
-                break;
-            }
-            todoList[i] = todoList[i + 1];
+
+        String sql = "DELETE FROM todolist WHERE id=?";
+        try (Connection conn = this.dataSource.getConnection();
+                PreparedStatement prepStmt = conn.prepareStatement(sql)) {
+
+            prepStmt.setInt(1, id);
+            prepStmt.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return true;
     }
-    
+
 }

@@ -15,10 +15,8 @@ public class TodoListServiceImpl implements TodoListService{
         TodoList[] todoList = todoListRepository.getAll();
         
         System.out.println("===TODOLIST===");
-        for (int i = 0; i < todoList.length; i++) {
-            if (todoList[i] != null) {
-                System.out.println(i + 1 + ". " + todoList[i].getTodo());
-            }
+        for (var todo: todoList) {
+            System.out.println(todo.getId() + ". " + todo.getTodo());
         }
         System.out.println("==============");
     }

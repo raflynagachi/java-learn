@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: raflynagachi.util.DatabaseUtilTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 s <<< FAILURE! - in raflynagachi.util.DatabaseUtilTest
+testDBConnection  Time elapsed: 0 s  <<< ERROR!
+java.sql.SQLException: HikariDataSource HikariDataSource (HikariPool-1) has been closed.
+	at raflynagachi.util.DatabaseUtilTest.testDBConnection(DatabaseUtilTest.java:14)
+
